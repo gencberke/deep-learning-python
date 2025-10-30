@@ -97,6 +97,64 @@ x = torch.arange(10)
 y = x.contiguous().view(2, 5)  # view contiguous ister
 print(y.shape)
 
+print("===================================== 5.1) Contiguous Mantığı: ")
+
+"""
+    "contiguous" bir tensor'un verilerinin bellekte (RAM'de) ardışık (bitişik) olarak tutulduğu anlamına gelir.
+    Yani elemanlar yan yana bir blok hâlinde depolanır.
+
+    Non-contiguous ise tensor'un bazı işlemler (örneğin transpose) sonrası bellekteki sıralamasının bozulduğu durumlardır.
+    Bu durumda tensor verisini farklı sırayla okur (stride değerleri değişir) ama fiziksel olarak kopya oluşturmaz.
+"""
+
+x = torch.tensor([[1, 2, 3],
+                  [4, 5, 6]])
+
+print("x:\n", x)
+print("x.is_contiguous() ->", x.is_contiguous())
+
+# Transpose işlemi (satır ↔ sütun değişimi) tensor'u non-contiguous yapar
+y = x.t()
+print("\ny = x.t():\n", y)
+print("y.is_contiguous() ->", y.is_contiguous())
+
+"""
+    view() fonksiyonu contiguous tensor'lar üzerinde çalışır, çünkü sadece "görünüm" değiştirir.
+    Eğer tensor contiguous değilse hata verir:
+"""
+try:
+    y.view(3, 2)
+except RuntimeError as e:
+    print("\nview() hatası:", e)
+
+"""
+    çözüm: .contiguous() çağırarak tensor'u bellekte ardışık hâle getirebiliriz.
+    bu işlem fiziksel bir kopya üretir ve ardından view() kullanılabilir.
+"""
+z = y.contiguous()
+print("\nYeni z = y.contiguous()")
+print("z.is_contiguous() ->", z.is_contiguous())
+print("z.view(3, 2):\n", z.view(3, 2))
+
+"""
+    reshape() -> otomatik olarak bu kontrolü yapar:
+        - eğer tensor contiguous ise: view() gibi davranır (no copy)
+        - değilse: contiguous() + view() kombinasyonu yapar (gerekirse copy)
+    bu yüzden reshape() daha esnektir, view() ise daha hızlıdır ama sınırlıdır.
+"""
+
+x = torch.arange(10)
+print("\nreshape örneği:", x.reshape(2, 5))
+print("view örneği:", x.contiguous().view(2, 5))
+
+"""
+    Özet Tablo:
+        - reshape(): gerekirse kopya oluşturur → güvenli ve esnek
+        - view(): contiguous zorunluluğu vardır → hızlı ama sınırlı
+        - .contiguous(): tensor'u bellekte yeniden düzenleyerek view() ile uyumlu hale getirir
+"""
+
+
 print("===================================== 6) Combining and Splitting Tensors: ")
 
 """
@@ -133,3 +191,19 @@ x = torch.ones(2, 1)
 y = torch.ones(1, 5)
 print((x + y).shape)  # -> torch.Size([2, 5])
 print(x + y)
+
+print("===================================== 📘 Summary Table: Tensor Operations")
+
+"""
+| Konsept | Açıklama | Örnek Kod |
+|----------|-----------|-----------|
+| element-wise operations | Her eleman kendi karşılığıyla işlem görür. | x * y, torch.add(x, y) |
+| in-place operation | Mevcut tensor'u değiştirir, yeni kopya oluşturmaz. | x.add_(y) |
+| matrix multiplication | Satır x sütun çarpımı yapar. | a @ b, torch.matmul(a, b) |
+| indexing / slicing | Belirli eleman veya aralık seçimi. | tensor[:, 1], tensor[0, 0] |
+| reshape / view | Tensor'un şeklini değiştirir (view contiguous ister). | x.reshape(3, 3), x.view(2, 5) |
+| contiguous | Tensor'un bellekte ardışık olma durumu. | x.is_contiguous(), x.contiguous() |
+| concatenate / split | Tensor'ları birleştirir veya böler. | torch.cat(), torch.split() |
+| interoperability | NumPy ve PyTorch objeleri bellek paylaşabilir. | torch.from_numpy(a), t.numpy() |
+| broadcasting | Boyutları farklı tensor'ları otomatik genişletir. | x + y (farklı shape'lerde) |
+"""

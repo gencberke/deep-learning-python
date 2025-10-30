@@ -146,7 +146,6 @@ my_tensor = my_tensor.to("cpu")  # my_tensor'u taşımamız gerektiğinde "<tens
 """
     3) tensor initialization shortcuts: 
 """
-
 eye = torch.eye(3)  # birebir (identity) matris
 full = torch.full((3, 3), 5)  # tüm elemanları verilen fill_value olan matris
 randn = torch.randn(3, 3)  # Gaussian dağılımından rastgele sayılar (ortalama 0, varyans 1)
@@ -160,3 +159,19 @@ x = torch.tensor([[2.0, 3.0]], requires_grad=True)
 y = (x ** 2).sum()  # scalar output için .sum() çünkü backward yapmak için tek dimension şimdilik
 y.backward()
 print(x.grad)  # gradient = 2*x yani tensor([[4., 6.]])
+
+print("===================================== 📘 Summary Table: Tensor Fundamentals")
+
+"""
+| Konsept | Açıklama | Örnek Kod |
+|----------|-----------|-----------|
+| tensor | PyTorch'un temel veri yapısı (multi-dimensional array). | x = torch.tensor([[1,2],[3,4]]) |
+| shape / dtype / device | Boyut, veri tipi ve işlem birimi (CPU/GPU). | x.shape, x.dtype, x.device |
+| tensor initialization | Farklı tensor oluşturma yolları. | torch.zeros(), torch.ones(), torch.rand() |
+| random generation | Rastgele tensor üretir (uniform veya normal dist.). | torch.rand(), torch.randn() |
+| arange / linspace | Sayı aralıklarından tensor oluşturur. | torch.arange(0,10,2), torch.linspace(0,1,5) |
+| device placement | Tensor’un CPU veya GPU’da oluşturulması. | x.to("cuda") |
+| numpy interoperability | NumPy array ↔ Torch tensor dönüşümü. | t.numpy(), torch.from_numpy(a) |
+| element-wise operations | Tüm elemanlarda aynı anda işlem yapar. | a + b, a * b |
+| requires_grad | Türevi takip edip etmeyeceğini belirler. | torch.tensor([1.0], requires_grad=True) |
+"""
